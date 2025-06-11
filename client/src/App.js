@@ -46,8 +46,14 @@ function App() {
 
   return (
     <div className="app">
+      <div className="hero-heading">
+        <h1 className="main-title">EchoNote.</h1>
+        <p className="main-subtext">Turn your voice into polished notes using AI.</p>
+      </div>
+  
       <div className="card">
-        <h1 className="title">Voice-to-Content AI</h1>
+        <h2 className="title">Voice-to-Content AI</h2>
+        <p className="subtitle">Upload, transcribe, summarize voice recordings with ease.</p>
   
         <input
           type="file"
@@ -61,33 +67,37 @@ function App() {
         </button>
   
         {transcription && (
-          <>
+          <div className="panel">
             <h3>Transcription:</h3>
             <p className="output">{transcription}</p>
   
             <button onClick={handleSummarize} className="btn">
               Summarize
             </button>
-          </>
+          </div>
         )}
   
         {summary && (
-          <>
+          <div className="panel">
             <h3>Summary:</h3>
             <p className="output">{summary}</p>
   
             <button onClick={handleGenerateVideo} className="btn">
               Generate Video
             </button>
-          </>
+          </div>
         )}
   
         {video && (
-          <video src={video} controls className="video-output" />
+          <div className="panel">
+            <h3>Generated Video:</h3>
+            <video src={video} controls className="video-output" />
+          </div>
         )}
       </div>
     </div>
   );
+  
   
 }
 
