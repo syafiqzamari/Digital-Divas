@@ -45,17 +45,50 @@ function App() {
   };
 
   return (
-    <div>
-      <h1>Voice-to-Content AI</h1>
-      <input type="file" onChange={handleAudioChange} />
-      <button onClick={handleTranscribe}>Transcribe</button>
-      <p>Transcription: {transcription}</p>
-      <button onClick={handleSummarize}>Summarize</button>
-      <p>Summary: {summary}</p>
-      <button onClick={handleGenerateVideo}>Generate Video</button>
-      <video src={video} controls />
+    <div className="app">
+      <div className="card">
+        <h1 className="title">Voice-to-Content AI</h1>
+  
+        <input
+          type="file"
+          onChange={handleAudioChange}
+          className="file-input"
+          accept="audio/*"
+        />
+  
+        <button onClick={handleTranscribe} className="btn">
+          Transcribe
+        </button>
+  
+        {transcription && (
+          <>
+            <h3>Transcription:</h3>
+            <p className="output">{transcription}</p>
+  
+            <button onClick={handleSummarize} className="btn">
+              Summarize
+            </button>
+          </>
+        )}
+  
+        {summary && (
+          <>
+            <h3>Summary:</h3>
+            <p className="output">{summary}</p>
+  
+            <button onClick={handleGenerateVideo} className="btn">
+              Generate Video
+            </button>
+          </>
+        )}
+  
+        {video && (
+          <video src={video} controls className="video-output" />
+        )}
+      </div>
     </div>
   );
+  
 }
 
 export default App;
