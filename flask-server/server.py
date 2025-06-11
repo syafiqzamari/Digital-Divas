@@ -15,10 +15,8 @@ CORS(app, resources={r"/*": {"origins": "*", "methods": ["GET", "POST", "OPTIONS
 
 # Load Whisper model
 whisper_model = whisper.load_model("base")
-
 # Load Hugging Face summarization pipeline
 client = OpenAI(api_key='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')
-
 # Create temporary directory for file storage
 temp_dir = tempfile.mkdtemp()
 os.makedirs(temp_dir, exist_ok=True)
