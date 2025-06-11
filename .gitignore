@@ -1,2 +1,3 @@
 *.wav
 flask-server/env
+flask-server/api.txt

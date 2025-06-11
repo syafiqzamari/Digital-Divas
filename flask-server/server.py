@@ -8,6 +8,9 @@ import whisper
 from openai import OpenAI
 from gtts import gTTS
 
+with open('api.txt', 'r') as file:
+    api = file.read().strip()
+
 app = Flask(__name__)
 CORS(app, resources={r"/*": {"origins": "*", "methods": ["GET", "POST", "OPTIONS"], "allow_headers": ["Content-Type"]}})
 
@@ -15,7 +18,7 @@ CORS(app, resources={r"/*": {"origins": "*", "methods": ["GET", "POST", "OPTIONS
 whisper_model = whisper.load_model("base")
 
 # Load Hugging Face summarization pipeline
-client = OpenAI(api_key="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")
+client = OpenAI(api_key=api)
 
 # Create temporary directory for file storage
 temp_dir = tempfile.mkdtemp()
