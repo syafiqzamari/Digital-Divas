@@ -1,13 +1,13 @@
+from gtts import gTTS
+
 import os
-import transformers
 
-# Get the cache directory
-cache_dir = transformers.file_utils.default_cache_path
+text="hello world"
 
-# Delete all files in the cache directory
-for file in os.listdir(cache_dir):
-    file_path = os.path.join(cache_dir, file)
-    if os.path.isfile(file_path):
-        os.remove(file_path)
+language="en"
 
-print("All downloaded models have been deleted")
+myobj = gTTS(text=text,lang=language,slow=False)
+
+myobj.save("welcome.mp3")
+
+os.system("start welcome.mp3")

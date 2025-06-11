@@ -8,7 +8,7 @@ import whisper
 from openai import OpenAI
 from gtts import gTTS
 
-api = os.getenv('OPENAI_API_KEY')
+
 
 app = Flask(__name__)
 CORS(app, resources={r"/*": {"origins": "*", "methods": ["GET", "POST", "OPTIONS"], "allow_headers": ["Content-Type"]}})
@@ -17,7 +17,7 @@ CORS(app, resources={r"/*": {"origins": "*", "methods": ["GET", "POST", "OPTIONS
 whisper_model = whisper.load_model("base")
 
 # Load Hugging Face summarization pipeline
-client = OpenAI(api_key=api)
+client = OpenAI(api_key='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')
 
 # Create temporary directory for file storage
 temp_dir = tempfile.mkdtemp()
@@ -54,7 +54,7 @@ def transcribe():
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
-@app.route("/summarize", methods=["POST"])
+@app.route("/generate-summarize", methods=["POST"])
 def summarize():
     try:
         if not request.json or "text" not in request.json:
@@ -65,20 +65,19 @@ def summarize():
             return jsonify({"error": "Invalid text provided"}), 400
 
         # Use the specified prompt format
-        prompt = """You are an expert note-taker. Based on the following text, create a detailed and well-organized set of notes in the following format:
-
-* Introduction: [insert introduction here]
-* Process: [insert process here]
-* Importance: [insert importance here]
-* Factors Affecting: [insert factors affecting here]
-
-Please use bullet points and short paragraphs to make the notes easy to read and understand. Be sure to include all the important details from the text."""
+        prompt = """You are NotesGPT, an AI language model skilled at taking detailed, concise, and easy-to-understand notes on various subjects in bullet-point format. When provided with a passage or a topic, your task is to:
+Create advanced bullet-point notes summarizing the important parts of the reading or topic.
+Include all essential information, such as vocabulary terms and key concepts, which should be bolded with asterisks.
+Remove any extraneous language, focusing only on the critical aspects of the passage or topic.
+Strictly base your notes on the provided information, without adding any external information.
+Conclude your notes with [End of Notes] to indicate completion.
+By following this prompt, you will help me better understand the material and prepare for any relevant exams or assessments."""
 
         response = client.chat.completions.create(
             model="gpt-4",
             messages=[
                 {"role": "system", "content": "You are a helpful assistant that creates detailed and well-organized notes."},
-                {"role": "user", "content": f"{prompt}\n\nText to summarize: {text}"}
+                {"role": "user", "content": f"{prompt}\n\nThe passage for this set of notes is: {text}"}
             ],
             temperature=0.7,
             max_tokens=1000
@@ -118,6 +117,108 @@ def generate_video():
 
     except Exception as e:
         return jsonify({"error": str(e)}), 500
+    
+@app.route("/generate-bullets", methods=["POST"])
+def generate_bullets():
+    try:
+        if not request.json or "text" not in request.json:
+            return jsonify({"error": "No text provided"}), 400
+
+        text = request.json["text"]
+        if not isinstance(text, str) or len(text.strip()) == 0:
+            return jsonify({"error": "Invalid text provided"}), 400
+
+        prompt = """You are a helpful assistant that converts text into bullet points. 
+                    Create concise bullet points that capture the main ideas of the following text: """
+
+        response = client.chat.completions.create(
+            model="gpt-4",
+            messages=[
+                {"role": "system", "content": "You are a helpful assistant that converts text into bullet points."},
+                {"role": "user", "content": f"{prompt}\n\n{text}"}
+            ],
+            temperature=0.7,
+            max_tokens=1000
+        )
+
+        bullet_points = response.choices[0].message.content
+
+        return jsonify({
+            "message": "Bullet points generated successfully",
+            "bullet_points": bullet_points
+        }), 200
+
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+    
+@app.route("/generate-flashcards", methods=["POST"])
+def generate_flashcards():
+    try:
+        if not request.json or "text" not in request.json:
+            return jsonify({"error": "No text provided"}), 400
+
+        text = request.json["text"]
+        if not isinstance(text, str) or len(text.strip()) == 0:
+            return jsonify({"error": "Invalid text provided"}), 400
+
+        prompt = """You are a helpful assistant that creates flashcards. 
+                    Identify key concepts and create flashcards with a question and answer format from the following text: """
+
+        response = client.chat.completions.create(
+            model="gpt-4",
+            messages=[
+                {"role": "system", "content": "You are a helpful assistant that creates flashcards."},
+                {"role": "user", "content": f"{prompt}\n\n{text}"}
+            ],
+            temperature=0.7,
+            max_tokens=1000
+        )
+
+        flashcards = response.choices[0].message.content
+
+        return jsonify({
+            "message": "Flashcards generated successfully",
+            "flashcards": flashcards
+        }), 200
+
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+    
+
+@app.route("/generate-mindmap", methods=["POST"])
+def generate_mindmap():
+    try:
+        if not request.json or "text" not in request.json:
+            return jsonify({"error": "No text provided"}), 400
+
+        text = request.json["text"]
+        if not isinstance(text, str) or len(text.strip()) == 0:
+            return jsonify({"error": "Invalid text provided"}), 400
+
+        prompt = """You are a helpful assistant that creates mind maps. 
+                    Identify key concepts and create a hierarchical mind map from the following text: """
+
+        response = client.chat.completions.create(
+            model="gpt-4",
+            messages=[
+                {"role": "system", "content": "You are a helpful assistant that creates mind maps."},
+                {"role": "user", "content": f"{prompt}\n\n{text}"}
+            ],
+            temperature=0.7,
+            max_tokens=1000
+        )
+
+        mind_map = response.choices[0].message.content
+
+        return jsonify({
+            "message": "Mind map generated successfully",
+            "mind_map": mind_map
+        }), 200
+
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+    
+
 
 if __name__ == "__main__":
     try:
