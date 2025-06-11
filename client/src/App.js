@@ -2,11 +2,14 @@ import React, { useState } from "react";
 import axios from "axios";
 import './App.css';
 
+
 function App() {
-  const [audioFile, setAudioFile] = useState(null);
+ const [audioFile, setAudioFile] = useState(null);
   const [transcription, setTranscription] = useState("");
   const [summary, setSummary] = useState("");
   const [video, setVideo] = useState(null);
+
+  console.log("Page1 component rendered");
 
   const handleAudioChange = (event) => {
     setAudioFile(event.target.files[0]);
@@ -16,30 +19,33 @@ function App() {
     const formData = new FormData();
     formData.append("audio", audioFile);
     axios.post("http://127.0.0.1:5000/transcribe", formData)
-     .then((response) => {
+   .then((response) => {
         setTranscription(response.data.transcription);
+        console.log("Transcription received");
       })
-     .catch((error) => {
+   .catch((error) => {
         console.error(error);
       });
   };
 
   const handleSummarize = () => {
     axios.post("http://127.0.0.1:5000/summarize", { text: transcription })
-     .then((response) => {
+   .then((response) => {
         setSummary(response.data.summary);
+        console.log("Summary received");
       })
-     .catch((error) => {
+   .catch((error) => {
         console.error(error);
       });
   };
 
   const handleGenerateVideo = () => {
     axios.post("http://127.0.0.1:5000/generate-video", { summary: summary })
-     .then((response) => {
+   .then((response) => {
         setVideo(response.data.video);
+        console.log("Video received");
       })
-     .catch((error) => {
+   .catch((error) => {
         console.error(error);
       });
   };
