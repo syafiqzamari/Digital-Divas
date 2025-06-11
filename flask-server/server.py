@@ -8,8 +8,7 @@ import whisper
 from openai import OpenAI
 from gtts import gTTS
 
-with open('api.txt', 'r') as file:
-    api = file.read().strip()
+api = os.getenv('OPENAI_API_KEY')
 
 app = Flask(__name__)
 CORS(app, resources={r"/*": {"origins": "*", "methods": ["GET", "POST", "OPTIONS"], "allow_headers": ["Content-Type"]}})
