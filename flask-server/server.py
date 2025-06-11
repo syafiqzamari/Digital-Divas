@@ -5,7 +5,7 @@ import tempfile
 import shutil
 from pathlib import Path
 import whisper
-from transformers import pipeline
+from openai import OpenAI
 from gtts import gTTS
 
 app = Flask(__name__)
@@ -15,13 +15,7 @@ CORS(app, resources={r"/*": {"origins": "*", "methods": ["GET", "POST", "OPTIONS
 whisper_model = whisper.load_model("base")
 
 # Load Hugging Face summarization pipeline
-summarizer = pipeline(
-    "text2text-generation",
-    model="google/flan-t5-large",
-    max_length=1000,
-    min_length=100,
-    do_sample=False,
-)
+client = OpenAI(api_key="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")
 
 # Create temporary directory for file storage
 temp_dir = tempfile.mkdtemp()
@@ -68,16 +62,37 @@ def summarize():
         if not isinstance(text, str) or len(text.strip()) == 0:
             return jsonify({"error": "Invalid text provided"}), 400
 
-        # Generate summary using the Hugging Face pipeline
-        summary = summarizer(text)
-        summary_text = summary[0]["generated_text"]
+        # Use the specified prompt format
+        prompt = """You are an expert note-taker. Based on the following text, create a detailed and well-organized set of notes in the following format:
+
+* Introduction: [insert introduction here]
+* Process: [insert process here]
+* Importance: [insert importance here]
+* Factors Affecting: [insert factors affecting here]
+
+Please use bullet points and short paragraphs to make the notes easy to read and understand. Be sure to include all the important details from the text."""
+
+        response = client.chat.completions.create(
+            model="gpt-4",
+            messages=[
+                {"role": "system", "content": "You are a helpful assistant that creates detailed and well-organized notes."},
+                {"role": "user", "content": f"{prompt}\n\nText to summarize: {text}"}
+            ],
+            temperature=0.7,
+            max_tokens=1000
+        )
+
+        summary_text = response.choices[0].message.content
 
         # Save summary to a local file
         file_path = os.path.join(os.path.expanduser("~"), "Documents", "notes.txt")
         with open(file_path, "w", encoding="utf-8") as f:
             f.write(summary_text)
 
-        return jsonify({"message": "Summary saved to local file successfully"}), 200
+        return jsonify({
+            "message": "Summary saved to local file successfully",
+            "summary": summary_text
+        }), 200
 
     except Exception as e:
         return jsonify({"error": str(e)}), 500
